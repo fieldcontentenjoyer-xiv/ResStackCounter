@@ -5,8 +5,8 @@
     "Description": "List various information about nearby players such as Phantom Job, Remaining Resurrection Stacks in Forked Tower: Blood and Knowledge Level. Use /ressc [settings] to open the main or settings window.",
     "ApplicableVersion": "any",
     "Tags": [
-        "fieldcontent",
-        "oc",
-        "forkedtower"
+        "field content",
+        "occult crescent",
+        "forked tower"
     ]
 }
