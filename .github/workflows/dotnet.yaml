@@ -26,14 +26,6 @@ jobs:
               run: |
                   $ver = '${{ github.ref_name }}'
                   invoke-expression 'dotnet build --no-restore --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
-            - name: write version into jsons
-              run: |
-                  $ver = '${{ github.ref_name }}'
-                  $path = './ResStackCounter/bin/Release/ResStackCounter.json'
-                  $json = Get-Content -Raw $path | ConvertFrom-Json
-                  $json.AssemblyVersion = $ver
-                  $content = $json | ConvertTo-Json
-                  set-content -Path $path -Value $content
             - name: Archive
               run: Compress-Archive -Path ResStackCounter/bin/Release/* -DestinationPath ResStackCounter.zip
             - name: Upload a Build Artifact
@@ -61,4 +53,3 @@ jobs:
                   asset_path: ./ResStackCounter.zip
                   asset_name: ResStackCounter.zip
                   asset_content_type: application/zip
-
