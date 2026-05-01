@@ -94,7 +94,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUi() => ConfigurationWindow.Toggle();
 
-    public void HandleTerritoryChanged(ushort newTerritoryId)
+    public void HandleTerritoryChanged(uint newTerritoryId)
     {
         if (newTerritoryId == TerritorySouthHorn)
         {
