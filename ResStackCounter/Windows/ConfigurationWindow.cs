@@ -35,14 +35,14 @@ public class ConfigurationWindow : Window, IDisposable
         }
         
         var autoOpenOnEntry = Configuration.AutoOpenOnEntry;
-        if (ImGui.Checkbox("Open automatically when entering South Horn", ref autoOpenOnEntry))
+        if (ImGui.Checkbox("Open automatically when entering South or North Horn", ref autoOpenOnEntry))
         {
             plugin.Config.AutoOpenOnEntry = autoOpenOnEntry;
             plugin.Config.Save();
         }
         
         var autoConfigureFilterOnEntry = Configuration.AutoFilterKnowledgeLevelOnEntry;
-        if (ImGui.Checkbox("Automatically reset filter on entry to show sub Knowledge Level 20 players", ref autoConfigureFilterOnEntry))
+        if (ImGui.Checkbox("Automatically reset filter on entry to show sub Knowledge Level 20/40 players", ref autoConfigureFilterOnEntry))
         {
             plugin.Config.AutoFilterKnowledgeLevelOnEntry = autoConfigureFilterOnEntry;
             plugin.Config.Save();
