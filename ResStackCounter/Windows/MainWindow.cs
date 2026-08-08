@@ -71,30 +71,28 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        if (Plugin.ClientState.TerritoryType != Plugin.TerritorySouthHorn)
+        if (Plugin.ClientState.TerritoryType is not Plugin.TerritorySouthHorn and not Plugin.TerritoryNorthHorn)
         {
-            ImGui.TextUnformatted("Currently not in South Horn!");
+            ImGui.TextUnformatted("Currently not in South/North Horn!");
             return;
         }
 
         ImGui.TextUnformatted($"Currently counted players: {Plugin.ObjectTable.PlayerObjects.Count()}");
         ImGui.Spacing();
 
-        using (var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true))
+        using var child = ImRaii.Child("SomeChildWithAScrollbar", Vector2.Zero, true);
+        if (child.Success)
         {
-            if (child.Success)
+            ImGui.SetNextItemWidth(150f);
+            var sortingOrder = plugin.Config.SortingOrder;
+            if (ImGuiEx.Combo("##order", ref sortingOrder, SortingOrder.Options))
             {
-                ImGui.SetNextItemWidth(150f);
-                var sortingOrder = plugin.Config.SortingOrder;
-                if (ImGuiEx.Combo("##order", ref sortingOrder, SortingOrder.Options))
-                {
-                    plugin.Config.SortingOrder = sortingOrder;
-                    plugin.Config.Save();
-                }
-
-                ImGui.Separator();
-                DrawStatusTable();
+                plugin.Config.SortingOrder = sortingOrder;
+                plugin.Config.Save();
             }
+
+            ImGui.Separator();
+            DrawStatusTable();
         }
     }
 
@@ -200,10 +198,10 @@ public class MainWindow : Window, IDisposable
 
         ImGui.TableNextColumn();
         ImGui.Text("Knowledge Level");
-        var hideLevel20Players = Configuration.HideLevel20PlayersFilter;
-        if (ImGui.Checkbox("Hide Level 20", ref hideLevel20Players))
+        var hideLevel20Or40Players = Configuration.HideLevel20Or40PlayersFilter;
+        if (ImGui.Checkbox("Hide Level 20/40", ref hideLevel20Or40Players))
         {
-            Configuration.HideLevel20PlayersFilter = hideLevel20Players;
+            Configuration.HideLevel20Or40PlayersFilter = hideLevel20Or40Players;
             Configuration.Save();
         }
 
@@ -341,7 +339,7 @@ public class MainWindow : Window, IDisposable
             return false;
         }
 
-        if (Configuration.HideLevel20PlayersFilter && knowledgeLevel == 20)
+        if (Configuration.HideLevel20Or40PlayersFilter && knowledgeLevel % 20 == 0)
         {
             return false;
         }

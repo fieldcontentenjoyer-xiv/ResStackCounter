@@ -1,4 +1,6 @@
-﻿using Dalamud.Game.Command;
+﻿using System;
+using Dalamud.Game.Command;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -27,25 +29,32 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService]
     internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
 
+    [PluginService]
+    internal static INotificationManager NotificationManager { get; private set; } = null!;
+
+    [PluginService]
+    internal static IPluginLog Log { get; private set; } = null!;
+
     private const string CommandName = "/ressc";
 
     public Configuration Config { get; init; }
 
     public readonly WindowSystem WindowSystem = new("ResStackCounter");
-    private MainWindow MainWindow { get; init; }
 
+    private MainWindow MainWindow { get; init; }
     private ConfigurationWindow ConfigurationWindow { get; init; }
 
     public Plugin()
     {
-        Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        Config = GetCurrentConfigVersion();
+        Config.Save();
 
         MainWindow = new MainWindow(this);
         ConfigurationWindow = new ConfigurationWindow(this);
 
         WindowSystem.AddWindow(MainWindow);
         WindowSystem.AddWindow(ConfigurationWindow);
-
+        
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Open the Res Stack Counter window ( add ' Settings' for settings instead)"
@@ -59,6 +68,24 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
 
         ClientState.TerritoryChanged += HandleTerritoryChanged;
+    }
+
+    private static Configuration GetCurrentConfigVersion()
+    {
+        var config = PluginInterface.GetPluginConfig() as Configuration;
+        if ( config != null && config.Version != Configuration.CurrentVersion)
+        {
+            NotificationManager.AddNotification(new Notification
+            {
+                Content = "ResStackCounter Configuration has been reset due to an update!",
+                Title = "Res Stack Counter",
+                Type = NotificationType.Warning,
+                InitialDuration = TimeSpan.FromMinutes(1)
+            });
+            return new Configuration();
+        }
+
+        return config ?? new Configuration();
     }
 
     public void Dispose()
@@ -96,7 +123,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void HandleTerritoryChanged(uint newTerritoryId)
     {
-        if (newTerritoryId == TerritorySouthHorn)
+        if (newTerritoryId is TerritorySouthHorn or TerritoryNorthHorn)
         {
             if (Config.AutoOpenOnEntry && !MainWindow.IsOpen)
             {
@@ -111,4 +138,5 @@ public sealed class Plugin : IDalamudPlugin
     }
 
     public const int TerritorySouthHorn = 1252;
+    public const int TerritoryNorthHorn = 1346;
 }

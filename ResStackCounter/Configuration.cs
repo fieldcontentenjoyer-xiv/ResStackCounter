@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -10,7 +11,8 @@ namespace ResStackCounter;
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
-    public int Version { get; set; } = 0;
+    public const int CurrentVersion = 1;
+    public int Version { get; set; } = CurrentVersion;
 
     public bool ShowMastery { get; set; } = true;
 
@@ -29,7 +31,7 @@ public class Configuration : IPluginConfiguration
     public PhantomJobFilterToggle[] PhantomJobFilter { get; set; } =
         PhantomJob.PhantomJobs.Select(pj => new PhantomJobFilterToggle(pj, true)).ToArray();
 
-    public bool HideLevel20PlayersFilter { get; set; }
+    public bool HideLevel20Or40PlayersFilter { get; set; }
 
     [JsonIgnore]
     public bool? AllPhantomJobs
@@ -59,7 +61,7 @@ public class Configuration : IPluginConfiguration
     public static readonly Configuration Default = new();
     public static readonly Configuration KnowledgeLevelFilterConfig = new()
     {
-        HideLevel20PlayersFilter = true
+        HideLevel20Or40PlayersFilter = true
     };
 
     public void CopyFilters(Configuration other)
@@ -68,7 +70,7 @@ public class Configuration : IPluginConfiguration
         {
             ResStackCountFilter[i] = other.ResStackCountFilter[i];
         }
-        HideLevel20PlayersFilter = other.HideLevel20PlayersFilter;
+        HideLevel20Or40PlayersFilter = other.HideLevel20Or40PlayersFilter;
         PhantomJobFilter = other.PhantomJobFilter;
     }
 }
